@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Рейтинг легкоатлетов</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <h1 id="title">Рейтинг легкоатлетов</h1>
+      <p id="updated" class="muted"></p>
+      <nav class="tabs" aria-label="Разделы">
+        <a href="#rating" data-tab="rating">Рейтинг</a>
+        <a href="#athletes" data-tab="athletes">Спортсмены</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="view-rating" hidden>
+      <div class="filters">
+        <label>Пол
+          <select id="f-gender">
+            <option value="">Все</option>
+            <option value="M">Мужчины</option>
+            <option value="F">Женщины</option>
+          </select>
+        </label>
+        <label>Возраст
+          <select id="f-age"></select>
+        </label>
+        <label class="wide">Дисциплина
+          <select id="f-event"></select>
+        </label>
+        <label class="wide full">Поиск
+          <input id="f-search" type="search" placeholder="Фамилия или имя" autocomplete="off">
+        </label>
+      </div>
+      <p id="rating-count" class="muted count"></p>
+      <ol id="rating-list" class="list"></ol>
+      <p id="rating-empty" class="empty" hidden></p>
+    </section>
+
+    <section id="view-athletes" hidden>
+      <div class="filters">
+        <label class="wide full">Поиск
+          <input id="a-search" type="search" placeholder="Фамилия, имя или год рождения" autocomplete="off">
+        </label>
+      </div>
+      <p id="athletes-count" class="muted count"></p>
+      <ul id="athletes-list" class="list"></ul>
+      <p id="athletes-empty" class="empty" hidden></p>
+    </section>
+
+    <section id="view-athlete" hidden></section>
+
+    <p id="status" class="empty">Загрузка…</p>
+  </main>
+
+  <footer class="wrap muted foot">Данные публикуются из приложения. Очки по шкале World Athletics с возрастным коэффициентом, разряды по нормам ЕВСК.</footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

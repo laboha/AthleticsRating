@@ -1,0 +1,192 @@
+:root {
+  --accent: #4F8FCF;
+  --on-accent: #FFFFFF;
+  --accent-soft: #E3EEF9;
+  --on-accent-soft: #1D4E7E;
+  --bg: #F5F7FA;
+  --card: #FFFFFF;
+  --text: #16191D;
+  --muted: #6A727C;
+  --line: #E4E8EC;
+  --outline: #C9D0D8;
+  --radius: 16px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: #8CBBE8;
+    --on-accent: #0D2C47;
+    --accent-soft: #213F5D;
+    --on-accent-soft: #D3E5F7;
+    --bg: #111315;
+    --card: #1B1E21;
+    --text: #E8EAED;
+    --muted: #9AA2AB;
+    --line: #2A2E33;
+    --outline: #3F454B;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+
+.top { padding: 28px 0 8px; }
+.top h1 { margin: 0; font-size: 28px; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; }
+.muted { color: var(--muted); }
+#updated { margin: 4px 0 16px; font-size: 14px; }
+
+/* Разделы: сегментированный переключатель */
+.tabs {
+  display: inline-flex;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 3px;
+}
+.tabs a {
+  padding: 8px 18px;
+  border-radius: 9px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 15px;
+}
+.tabs a[aria-current="page"] { background: var(--accent-soft); color: var(--on-accent-soft); }
+.tabs a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+main { padding-top: 16px; padding-bottom: 24px; min-height: 50vh; }
+
+/* Фильтры */
+.filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.filters label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); }
+.filters .wide { grid-column: 1 / -1; }
+@media (min-width: 640px) {
+  .filters { grid-template-columns: 1fr 1fr 2fr; }
+  .filters .wide { grid-column: auto; }
+  .filters .full { grid-column: 1 / -1; }
+}
+select, input[type="search"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  font: inherit;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--outline);
+  border-radius: 12px;
+}
+select {
+  padding-right: 32px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 19px, calc(100% - 13px) 19px;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+select:focus, input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+.count { font-size: 14px; margin: 12px 4px 10px; }
+
+/* Списки */
+.list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.list > li { min-width: 0; }
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px 12px 12px;
+  background: var(--card);
+  border-radius: var(--radius);
+  color: inherit;
+  text-decoration: none;
+  min-height: 72px;
+}
+a.row:hover { background: color-mix(in srgb, var(--card) 92%, var(--accent)); }
+a.row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.place { width: 28px; text-align: center; font-size: 17px; color: var(--muted); flex: none; font-variant-numeric: tabular-nums; }
+.place.top3 { color: var(--accent); font-weight: 700; }
+
+.avatar {
+  flex: none;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--on-accent-soft);
+  display: grid; place-items: center;
+  font-weight: 600; font-size: 15px;
+  overflow: hidden;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.avatar.big { width: 104px; height: 104px; font-size: 34px; margin: 0 auto; }
+
+.info { flex: 1; min-width: 0; }
+.name { font-size: 16px; font-weight: 500; line-height: 1.3; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.sub { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+
+.badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 1px 8px;
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--on-accent-soft);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.pts { text-align: right; flex: none; }
+.pts b { display: block; font-size: 20px; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1.2; }
+.pts span { font-size: 12px; color: var(--muted); }
+
+.empty { color: var(--muted); text-align: center; padding: 48px 24px; margin: 0; line-height: 1.5; }
+
+/* Карточка спортсмена */
+.back {
+  display: inline-block;
+  margin: 0 0 12px -8px;
+  padding: 8px;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.profile { text-align: center; }
+.profile h2 { margin: 14px 0 4px; font-size: 24px; font-weight: 600; line-height: 1.25; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 20px 0 10px; }
+.stat { background: var(--card); border-radius: var(--radius); padding: 14px 8px; text-align: center; }
+.stat b { display: block; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.stat b.acc { color: var(--accent); }
+.stat span { font-size: 12px; color: var(--muted); }
+.best-line { text-align: center; color: var(--muted); font-size: 14px; margin: 0; }
+
+h3 { font-size: 17px; font-weight: 600; margin: 28px 4px 10px; }
+
+.hist .row { min-height: 0; padding: 14px 16px; align-items: flex-start; }
+.hist .res { text-align: right; flex: none; }
+.hist .res b { display: block; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.hist .res span { font-size: 14px; color: var(--accent); }
+.best-mark { color: var(--accent); font-size: 12px; font-weight: 600; margin-left: 8px; }
+
+.foot { font-size: 13px; padding-top: 8px; padding-bottom: 32px; line-height: 1.5; }
+
+@media (prefers-reduced-motion: no-preference) {
+  a.row { transition: background-color .15s ease; }
+}
