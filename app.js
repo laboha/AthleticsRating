@@ -64,13 +64,9 @@ function rankClass(rank) {
   if (/юн/.test(rank)) return 'youth';
   return 'none';
 }
-/** Разряд в круге; «III юн.» — в две строки: «III» и «юн». */
+/** Разряд — просто жирный текст; «б/р» приглушённо. */
 function rankBadge(rank, extra = '') {
-  const youth = /юн/.test(rank);
-  const main = youth ? rank.split(' ')[0] : rank;
-  const size = rank === 'б/р' ? 's3' : main.length >= 4 ? 's4' : main.length === 3 ? 's3' : 's2';
-  const inner = youth ? `<b>${esc(main)}</b><i>юн</i>` : `<b>${esc(main)}</b>`;
-  return `<span class="rank ${rankClass(rank)} ${size} ${extra}" title="Разряд ${esc(rank)}" aria-label="Разряд ${esc(rank)}">${inner}</span>`;
+  return `<span class="rank${rank === 'б/р' ? ' none' : ''} ${extra}" title="Разряд ${esc(rank)}">${esc(rank)}</span>`;
 }
 
 function avatar(a) {
@@ -269,94 +265,8 @@ function personalRecords(results) {
   }).filter(Boolean);
 }
 
-// ---------- номинации сезона (только текущий год; 1 января всё обнуляется) ----------
-
-const NOMINATIONS = [
-  { id: 'SPRINTER', title: 'Лучший спринтер', events: ['60m', '100m', '200m', '400m'], icon: 'sprinter' },
-  { id: 'HURDLER', title: 'Лучший барьерист', events: ['60mH', '100mH', '110mH', '400mH'], icon: 'hurdler' },
-  { id: 'JUMPER', title: 'Лучший прыгун', events: ['HJ', 'PV', 'LJ', 'TJ'], icon: 'jumper' },
-  { id: 'THROWER', title: 'Лучший метатель', events: ['SP', 'DT', 'HT', 'JT'], icon: 'thrower' },
-  { id: 'TITLED', title: 'Самый титулованный', icon: 'titled' },
-  { id: 'STABLE', title: 'Самый стабильный', icon: 'stable' },
-  { id: 'NATIONAL', title: 'Лучший на Всероссийском уровне', icon: 'national' },
-  { id: 'PROGRESS', title: 'Самый прогрессирующий', icon: 'progress' }
-];
-const TITLE_WEIGHT = { RUSSIA_CHAMPIONSHIP: 5, RUSSIA_YOUTH: 4, ALL_RUSSIAN: 3, CITY: 2 };
-const yearOf = (t) => new Date(t).getUTCFullYear();
-
-function groupLabel(gender, group) {
-  const m = gender === 'M';
-  if (group.id === 'SENIOR') return m ? 'Мужчины' : 'Женщины';
-  if (group.id === 'U23' || group.id === 'U20') return (m ? 'Юниоры ' : 'Юниорки ') + group.label;
-  return (m ? 'Юноши ' : 'Девушки ') + group.label;
-}
-
-function winners(scores) {
-  let top = 0;
-  for (const v of scores.values()) top = Math.max(top, v);
-  if (top <= 0) return [];
-  return [...scores].filter(([, v]) => Math.abs(v - top) < 1e-9).map(([id]) => id);
-}
-
-function computeNominations(year) {
-  const season = new Map();
-  for (const [id, list] of state.byAthlete) {
-    const s = list.filter((r) => yearOf(r.date) === year);
-    if (s.length) season.set(id, s);
-  }
-  const athletes = state.data.athletes.filter((a) => season.has(a.id));
-  const out = new Map();
-  const award = (ids, n) => ids.forEach((id) => { if (!out.has(id)) out.set(id, []); out.get(id).push(n); });
-
-  for (const nom of NOMINATIONS.filter((n) => n.events)) {
-    for (const gender of ['M', 'F']) {
-      for (const group of AGE_GROUPS) {
-        const scores = new Map();
-        athletes.filter((a) => a.gender === gender && ageGroupOf(year - a.birthYear).id === group.id).forEach((a) => {
-          scores.set(a.id, Math.max(0, ...season.get(a.id).filter((r) => nom.events.includes(r.eventId)).map((r) => r.points)));
-        });
-        award(winners(scores), { nom, year, gender, group: groupLabel(gender, group) });
-      }
-    }
-  }
-  const byNom = (id) => NOMINATIONS.find((n) => n.id === id);
-  const titled = new Map(athletes.map((a) => {
-    const s = season.get(a.id);
-    const score = s.reduce((sum, r) => sum + (r.place >= 1 && r.place <= 3 ? (4 - r.place) * (TITLE_WEIGHT[r.status] || 1) : 0), 0);
-    return [a.id, score ? score + s.filter((r) => r.place === 1).length / 1000 : 0];
-  }));
-  award(winners(titled), { nom: byNom('TITLED'), year });
-
-  const stable = new Map(athletes.map((a) => {
-    const pts = season.get(a.id).map((r) => r.points);
-    if (pts.length < 3) return [a.id, 0];
-    const mean = pts.reduce((x, y) => x + y, 0) / pts.length;
-    if (mean <= 0) return [a.id, 0];
-    const sd = Math.sqrt(pts.reduce((x, p) => x + (p - mean) ** 2, 0) / pts.length);
-    return [a.id, Math.max(0, 1 - sd / mean) + pts.length / 1e6];
-  }));
-  award(winners(stable), { nom: byNom('STABLE'), year });
-
-  const national = new Map(athletes.map((a) => [a.id, Math.max(0, ...season.get(a.id).filter((r) => NATIONAL.has(r.status)).map((r) => r.points))]));
-  award(winners(national), { nom: byNom('NATIONAL'), year });
-
-  const progress = new Map(athletes.map((a) => {
-    const mine = state.byAthlete.get(a.id);
-    let bestGain = 0;
-    for (const ev of new Set(mine.map((r) => r.eventId))) {
-      const inEv = mine.filter((r) => r.eventId === ev);
-      const s = inEv.filter((r) => yearOf(r.date) === year).sort((x, y) => x.date - y.date);
-      if (!s.length) continue;
-      const before = inEv.filter((r) => yearOf(r.date) < year).map((r) => r.basePoints);
-      const ref = before.length ? Math.max(...before) : s.length >= 2 ? s[0].basePoints : null;
-      if (ref === null) continue;
-      bestGain = Math.max(bestGain, Math.max(...s.map((r) => r.basePoints)) - ref);
-    }
-    return [a.id, bestGain];
-  }));
-  award(winners(progress), { nom: byNom('PROGRESS'), year });
-  return out;
-}
+// ---------- номинации сезона ----------
+// Считает приложение (только текущий год) и публикует готовыми в data.json → nominations.
 
 // ---------- рейтинг ----------
 
@@ -486,13 +396,13 @@ function renderAthlete(id) {
 
   // Номинации сезона
   const year = thisYear;
-  const noms = (state.nominations || (state.nominations = computeNominations(year))).get(a.id) || [];
+  const noms = ((state.data.nominations || {})[a.id] || []).filter((n) => n.year === year);
   const nominations = `
     <div class="section-h"><h3>Номинации</h3><span>${year}</span></div>
     ${noms.length ? `<div class="noms">${noms.map((n) => `
       <div class="nom">
-        <img src="img/nom_${n.nom.icon}${n.nom.events ? (n.gender === 'F' ? '_f' : '_m') : ''}.png" alt="" width="96" height="96" loading="lazy">
-        <b>${esc(n.nom.title)}</b>
+        <img src="img/${esc(n.icon)}.png" alt="" width="96" height="96" loading="lazy">
+        <b>${esc(n.title)}</b>
         <span>${n.group ? esc(n.group) + ', ' : ''}${n.year}</span>
       </div>`).join('')}</div>` : '<p class="empty-box">Номинаций пока нет</p>'}`;
 
@@ -599,7 +509,6 @@ function timeline(results, top) {
       const ev = state.events.get(r.eventId);
       const { pb, improved, prev } = info.get(r.id);
       const d = prev ? r.points - prev.points : null;
-      const coef = r.coef > 1.0001 ? `, коэф. ×${r.coef.toFixed(2).replace('.', ',')}` : '';
       const comp = [r.place ? `${r.place} место` : '', r.statusLabel || ''].filter(Boolean).join(', ');
       html += `
       <li>
@@ -610,7 +519,7 @@ function timeline(results, top) {
           ${comp ? `<div class="comp">${esc(comp)}</div>` : ''}
           <div class="ev-meta">${rankBadge(r.rank)}${improved ? '<span class="tag">ЛР</span>' : ''}${top && r.id === top.id ? '<span class="tag best">В рейтинге</span>' : ''}</div>
         </div>
-        <div class="r"><b>${esc(r.display)}</b><span>${r.points}${coef}</span>${d !== null && d !== 0 ? `<div class="delta ${d > 0 ? 'up' : 'down'}">${signed(d)}</div>` : ''}</div>
+        <div class="r"><b>${esc(r.display)}</b><span>${r.points}</span>${d !== null && d !== 0 ? `<div class="delta ${d > 0 ? 'up' : 'down'}">${signed(d)}</div>` : ''}</div>
       </li>`;
     }
     html += '</ol>';

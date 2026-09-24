@@ -256,33 +256,23 @@ a.row:focus-visible { outline-offset: -2px; border-radius: 0; }
 .move.down { color: var(--down); }
 .move.new { color: var(--text-3); font-weight: 500; }
 
-/* Разряды — в круге */
+/* Разряд — просто жирный текст. Минимальная ширина — чтобы в списках всё стояло ровно */
 .rank {
-  display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
-  width: 30px; height: 30px; border-radius: 50%;
-  vertical-align: middle; line-height: 1; white-space: nowrap;
-  font-weight: 600; font-variant-numeric: tabular-nums;
+  display: inline-block; min-width: 44px;
+  font-size: 13px; line-height: 18px; font-weight: 700; color: var(--text);
+  white-space: nowrap; font-variant-numeric: tabular-nums;
 }
-.rank b { font-weight: 600; }
-.rank i { font-style: normal; font-weight: 500; font-size: 8px; margin-top: 1px; }
-.rank.s2 { font-size: 12px; }
-.rank.s3 { font-size: 10.5px; }
-.rank.s4 { font-size: 9px; letter-spacing: -0.02em; }
-.rank.youth b { font-size: 11px; }
-.rank.master { background: var(--r-master-bg); color: var(--r-master-fg); }
-.rank.kms { background: var(--r-kms-bg); color: var(--r-kms-fg); }
-.rank.adult { background: var(--r-adult-bg); color: var(--r-adult-fg); }
-.rank.youth { box-shadow: inset 0 0 0 1px var(--r-youth-line); color: var(--r-youth-fg); }
-.rank.none { color: var(--text-3); font-weight: 400; }
-.meta .rank-in { width: 26px; height: 26px; }
-.pb-sub .rank { width: 36px; height: 36px; }
-.pb-sub .rank.s2 { font-size: 14px; } .pb-sub .rank.s3 { font-size: 12px; } .pb-sub .rank.s4 { font-size: 10px; }
+.rank.none { color: var(--text-3); font-weight: 500; }
+.c-rank .rank { text-align: right; }
+.pb-sub .rank { min-width: 0; font-size: 14px; }
+.tl .ev-meta .rank { min-width: 0; margin-right: 4px; }
 
 @media (max-width: 560px) {
   .board-head, .row { grid-template-columns: 36px minmax(0, 1fr) 56px 52px; column-gap: 10px; padding-right: 12px; padding-left: 4px; }
   #view-athletes .board-head, #view-athletes .row { grid-template-columns: minmax(0, 1fr) 52px; padding-left: 12px; }
   .board-head .c-rank, .row > .c-rank { display: none; }
-  .meta .rank-in { display: inline-flex; flex: none; }
+  .meta .rank-in { display: inline-block; flex: none; min-width: 34px; font-size: 12px; }
+  .meta { gap: 4px; }
   .spark { width: 56px; }
   .avatar { width: 32px; height: 32px; font-size: 12px; }
   .who { gap: 10px; }
