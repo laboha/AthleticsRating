@@ -2,16 +2,21 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#F7F8FA" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0F1216" media="(prefers-color-scheme: dark)">
   <title>Рейтинг легкоатлетов</title>
+  <link rel="preload" href="fonts/Geist.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="top">
-    <div class="wrap">
-      <h1 id="title">Рейтинг легкоатлетов</h1>
-      <p id="updated" class="muted"></p>
+  <header class="top" id="top">
+    <div class="wrap top-in">
+      <div class="brand">
+        <h1 id="title">Рейтинг легкоатлетов</h1>
+        <p id="updated" class="updated"></p>
+      </div>
       <nav class="tabs" aria-label="Разделы">
         <a href="#rating" data-tab="rating">Рейтинг</a>
         <a href="#athletes" data-tab="athletes">Спортсмены</a>
@@ -21,47 +26,80 @@
 
   <main class="wrap">
     <section id="view-rating" hidden>
-      <div class="filters">
-        <label>Пол
+      <div class="toolbar">
+        <label class="field">
+          <span>Пол</span>
           <select id="f-gender">
             <option value="">Все</option>
             <option value="M">Мужчины</option>
             <option value="F">Женщины</option>
           </select>
         </label>
-        <label>Возраст
+        <label class="field">
+          <span>Возраст</span>
           <select id="f-age"></select>
         </label>
-        <label class="wide">Дисциплина
+        <label class="field field-event">
+          <span>Дисциплина</span>
           <select id="f-event"></select>
         </label>
-        <label class="wide full">Поиск
-          <input id="f-search" type="search" placeholder="Фамилия или имя" autocomplete="off">
+        <label class="field field-search">
+          <span>Поиск</span>
+          <span class="search">
+            <input id="f-search" type="search" placeholder="Фамилия или имя" autocomplete="off">
+            <kbd aria-hidden="true">/</kbd>
+          </span>
         </label>
       </div>
-      <p id="rating-count" class="muted count"></p>
-      <ol id="rating-list" class="list"></ol>
+
+      <div class="board" id="rating-board">
+        <div class="board-head" aria-hidden="true">
+          <span class="c-place">Место</span>
+          <span class="c-who">Спортсмен</span>
+          <span class="c-spark">Динамика</span>
+          <span class="c-rank">Разряд</span>
+          <span class="c-pts">Очки</span>
+        </div>
+        <ol id="rating-list" class="rows"></ol>
+      </div>
       <p id="rating-empty" class="empty" hidden></p>
     </section>
 
     <section id="view-athletes" hidden>
-      <div class="filters">
-        <label class="wide full">Поиск
-          <input id="a-search" type="search" placeholder="Фамилия, имя или год рождения" autocomplete="off">
+      <div class="toolbar">
+        <label class="field field-search wide">
+          <span>Поиск</span>
+          <span class="search">
+            <input id="a-search" type="search" placeholder="Фамилия, имя или год рождения" autocomplete="off">
+            <kbd aria-hidden="true">/</kbd>
+          </span>
         </label>
       </div>
-      <p id="athletes-count" class="muted count"></p>
-      <ul id="athletes-list" class="list"></ul>
+      <div class="board">
+        <div class="board-head" aria-hidden="true">
+          <span class="c-who">Спортсмен</span>
+          <span class="c-rank">Разряд</span>
+          <span class="c-pts">Очки</span>
+        </div>
+        <ul id="athletes-list" class="rows"></ul>
+      </div>
       <p id="athletes-empty" class="empty" hidden></p>
     </section>
 
     <section id="view-athlete" hidden></section>
 
-    <p id="status" class="empty">Загрузка…</p>
+    <div id="status" class="board skeleton" aria-label="Загрузка">
+      <div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div>
+    </div>
+    <p id="status-error" class="empty" hidden></p>
   </main>
 
-  <footer class="wrap muted foot">Данные публикуются из приложения. Очки по шкале World Athletics с возрастным коэффициентом, разряды по нормам ЕВСК.</footer>
+  <footer class="wrap foot">
+    Очки по шкале World Athletics с возрастным коэффициентом, разряды по нормам ЕВСК.
+    Данные публикуются из приложения.
+  </footer>
 
+  <div id="tip" class="tip" role="status" hidden></div>
   <script src="app.js"></script>
 </body>
 </html>

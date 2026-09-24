@@ -1,192 +1,472 @@
+/* Рейтинг легкоатлетов — визуальный язык «электронного протокола».
+   Громко только цифры. Один акцент: голубой = «лучше». Линии 1px вместо карточек. */
+
+@font-face {
+  font-family: "Geist";
+  src: url("fonts/Geist.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --accent: #4F8FCF;
-  --on-accent: #FFFFFF;
-  --accent-soft: #E3EEF9;
-  --on-accent-soft: #1D4E7E;
-  --bg: #F5F7FA;
-  --card: #FFFFFF;
-  --text: #16191D;
-  --muted: #6A727C;
-  --line: #E4E8EC;
-  --outline: #C9D0D8;
-  --radius: 16px;
+  --bg: #F7F8FA;
+  --surface: #FFFFFF;
+  --hover: #F3F5F8;
+  --line: #E6E8EB;
+  --line-strong: #D3D8DE;
+  --text: #1B1F24;
+  --text-2: #5B6470;
+  --text-3: #6B7480;
+  --spark: #A3ABB5;
+
+  --accent: #4F8FCF;       /* линии, точки, полосы */
+  --accent-ink: #2F6FAE;   /* текст и ссылки акцентом (контраст 5,2:1) */
+  --accent-wash: #EAF2FB;
+
+  /* Разряды: одна шкала голубого, от насыщенного к контурному */
+  --r-master-bg: #17467A; --r-master-fg: #FFFFFF;
+  --r-kms-bg: #2F6FAE;    --r-kms-fg: #FFFFFF;
+  --r-adult-bg: #E3EEF9;  --r-adult-fg: #1F5F9E;
+  --r-youth-line: #C9D6E3; --r-youth-fg: #4A6F94;
+
+  --up: #2B7D52;           /* рост: приглушённый зелёный, всегда со знаком «+» */
+  --down: #B8433B;         /* падение: приглушённый красный, всегда со знаком «−» */
+  --gold: #C9A227; --silver: #A7AFB9; --bronze: #B87333;
+  --flame-outer: #F26B1D; --flame-inner: #FFC53D;
+
+  --radius: 12px;
+  --radius-s: 8px;
+  --pad: 16px;
+  --shadow-float: 0 1px 0 rgba(16, 24, 40, .04), 0 8px 24px rgba(16, 24, 40, .12);
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --accent: #8CBBE8;
-    --on-accent: #0D2C47;
-    --accent-soft: #213F5D;
-    --on-accent-soft: #D3E5F7;
-    --bg: #111315;
-    --card: #1B1E21;
-    --text: #E8EAED;
-    --muted: #9AA2AB;
-    --line: #2A2E33;
-    --outline: #3F454B;
+    --bg: #0F1216;
+    --surface: #161A1F;
+    --hover: #1C2127;
+    --line: #262B32;
+    --line-strong: #333A42;
+    --text: #E6E9ED;
+    --text-2: #9AA3AE;
+    --text-3: #808995;
+    --spark: #56606B;
+
+    --accent: #7DB3E8;
+    --accent-ink: #8DBDEB;
+    --accent-wash: #1A2A3B;
+
+    --r-master-bg: #A9CDF1; --r-master-fg: #0B2440;
+    --r-kms-bg: #2F6FAE;    --r-kms-fg: #FFFFFF;
+    --r-adult-bg: #1E3550;  --r-adult-fg: #CFE2F5;
+    --r-youth-line: #34465A; --r-youth-fg: #8FA9C4;
+
+    --up: #5DBB8A;
+    --down: #E07B73;
+    --gold: #D4AE45; --silver: #A9B2BC; --bronze: #C08457;
+    --flame-outer: #FF8A3D; --flame-inner: #FFD166;
+    --shadow-float: 0 8px 24px rgba(0, 0, 0, .5);
     color-scheme: dark;
   }
 }
 
 * { box-sizing: border-box; }
-
 html { -webkit-text-size-adjust: 100%; }
-
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font: 400 15px/22px "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "ss01" 0;
 }
+::selection { background: var(--accent-wash); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 
-.wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 var(--pad); }
+.num { font-variant-numeric: tabular-nums; }
 
-.top { padding: 28px 0 8px; }
-.top h1 { margin: 0; font-size: 28px; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; }
-.muted { color: var(--muted); }
-#updated { margin: 4px 0 16px; font-size: 14px; }
-
-/* Разделы: сегментированный переключатель */
-.tabs {
-  display: inline-flex;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 3px;
+/* ---------- Шапка ---------- */
+.top {
+  position: sticky; top: 0; z-index: 10;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  -webkit-backdrop-filter: saturate(1.4) blur(12px);
+  backdrop-filter: saturate(1.4) blur(12px);
+  border-bottom: 1px solid transparent;
+  transition: border-color .16s ease;
 }
+.top.scrolled { border-bottom-color: var(--line); }
+.top-in { padding-top: 20px; }
+.brand h1 { margin: 0; font-size: 28px; line-height: 32px; font-weight: 600; letter-spacing: -0.02em; }
+.updated { margin: 4px 0 0; font-size: 13px; line-height: 18px; color: var(--text-3); }
+
+.tabs { display: flex; gap: 24px; margin-top: 16px; }
 .tabs a {
-  padding: 8px 18px;
-  border-radius: 9px;
-  color: var(--text);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 15px;
+  position: relative;
+  padding: 10px 0 12px;
+  font-size: 14px; line-height: 20px; font-weight: 500;
+  color: var(--text-2); text-decoration: none;
 }
-.tabs a[aria-current="page"] { background: var(--accent-soft); color: var(--on-accent-soft); }
-.tabs a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tabs a:hover { color: var(--text); }
+.tabs a[aria-current="page"] { color: var(--text); }
+.tabs a[aria-current="page"]::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 2px; border-radius: 2px; background: var(--accent);
+}
 
-main { padding-top: 16px; padding-bottom: 24px; min-height: 50vh; }
+main { padding-top: 20px; padding-bottom: 32px; min-height: 60vh; }
 
-/* Фильтры */
-.filters {
+/* ---------- Фильтры ---------- */
+.toolbar {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 8px;
+  gap: 8px;
+  margin-bottom: 16px;
 }
-.filters label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); }
-.filters .wide { grid-column: 1 / -1; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field > span:first-child { font-size: 12px; line-height: 16px; font-weight: 500; color: var(--text-3); letter-spacing: .01em; }
+.field-event, .field-search, .wide { grid-column: 1 / -1; }
 @media (min-width: 640px) {
-  .filters { grid-template-columns: 1fr 1fr 2fr; }
-  .filters .wide { grid-column: auto; }
-  .filters .full { grid-column: 1 / -1; }
+  .toolbar { grid-template-columns: 132px 132px 1fr 1.1fr; }
+  .field-event, .field-search { grid-column: auto; }
+  .wide { grid-column: 1 / -1; }
 }
 select, input[type="search"] {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 100%;
-  height: 44px;
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 36px;
   padding: 0 12px;
-  font: inherit;
+  font: inherit; font-size: 14px;
   color: var(--text);
-  background: var(--card);
-  border: 1px solid var(--outline);
-  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-s);
+  transition: border-color .12s ease, box-shadow .12s ease;
 }
 select {
-  padding-right: 32px;
-  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
-  background-position: calc(100% - 18px) 19px, calc(100% - 13px) 19px;
-  background-size: 5px 5px;
-  background-repeat: no-repeat;
+  padding-right: 30px; cursor: pointer;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text-3) 50%),
+    linear-gradient(135deg, var(--text-3) 50%, transparent 50%);
+  background-position: calc(100% - 16px) 15px, calc(100% - 11px) 15px;
+  background-size: 5px 5px; background-repeat: no-repeat;
 }
-select:focus, input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+select:hover, input[type="search"]:hover { border-color: var(--text-3); }
+select:focus, input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-wash); }
+.search { position: relative; display: block; }
+.search input { padding-right: 36px; }
+.search input::-webkit-search-cancel-button { display: none; }
+kbd {
+  position: absolute; right: 8px; top: 8px;
+  min-width: 20px; height: 20px; padding: 0 5px;
+  font: 500 12px/18px "Geist", system-ui, sans-serif; color: var(--text-3);
+  text-align: center;
+  border: 1px solid var(--line-strong); border-radius: 5px;
+  pointer-events: none;
+}
+.search input:focus + kbd, .search input:not(:placeholder-shown) + kbd { display: none; }
+@media (hover: none) { kbd { display: none; } }
 
-.count { font-size: 14px; margin: 12px 4px 10px; }
-
-/* Списки */
-.list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
-.list > li { min-width: 0; }
-.row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px 12px 12px;
-  background: var(--card);
+/* ---------- Таблица рейтинга ---------- */
+.board {
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
-  color: inherit;
-  text-decoration: none;
-  min-height: 72px;
-}
-a.row:hover { background: color-mix(in srgb, var(--card) 92%, var(--accent)); }
-a.row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-.place { width: 28px; text-align: center; font-size: 17px; color: var(--muted); flex: none; font-variant-numeric: tabular-nums; }
-.place.top3 { color: var(--accent); font-weight: 700; }
-
-.avatar {
-  flex: none;
-  width: 44px; height: 44px;
-  border-radius: 50%;
-  background: var(--accent-soft);
-  color: var(--on-accent-soft);
-  display: grid; place-items: center;
-  font-weight: 600; font-size: 15px;
   overflow: hidden;
 }
+.board-head, .row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 80px 72px 64px;
+  align-items: center;
+  column-gap: 12px;
+  padding: 0 16px 0 8px;
+}
+#view-athletes .board-head, #view-athletes .row { grid-template-columns: minmax(0, 1fr) 72px 64px; padding-left: 16px; }
+.board-head {
+  height: 36px;
+  font-size: 12px; line-height: 16px; font-weight: 500; color: var(--text-3);
+  border-bottom: 1px solid var(--line);
+}
+.board-head .c-place { text-align: center; }
+.board-head .c-rank, .board-head .c-pts { text-align: right; }
+.board-head .c-spark { text-align: left; }
+
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows > li { min-width: 0; }
+.rows > li + li { border-top: 1px solid var(--line); }
+.rows > li.podium-end + li { border-top-color: var(--line-strong); }
+
+.row {
+  position: relative;
+  min-height: 64px; padding-top: 12px; padding-bottom: 12px;
+  text-decoration: none; color: inherit;
+  transition: background-color .12s ease;
+}
+a.row:hover { background: var(--hover); }
+a.row:focus-visible { outline-offset: -2px; border-radius: 0; }
+
+.place {
+  text-align: center;
+  font-size: 20px; line-height: 24px; font-weight: 400; letter-spacing: -0.01em;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+.row.top3 .place { color: var(--accent-ink); font-weight: 600; }
+.row.top3::before {
+  content: ""; position: absolute; left: 0; top: 12px; bottom: 12px;
+  width: 2px; border-radius: 0 2px 2px 0; background: var(--accent);
+}
+
+.who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.avatar {
+  flex: none; width: 36px; height: 36px; border-radius: 50%;
+  display: grid; place-items: center; overflow: hidden;
+  background: var(--hover); color: var(--text-2);
+  font-size: 13px; font-weight: 600; letter-spacing: .02em;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
 .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.avatar.big { width: 104px; height: 104px; font-size: 34px; margin: 0 auto; }
+.who-text { min-width: 0; }
+.name {
+  font-size: 15px; line-height: 20px; font-weight: 500;
+  overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.meta { margin-top: 2px; font-size: 13px; line-height: 18px; color: var(--text-2); white-space: nowrap; }
+.meta { display: flex; align-items: center; gap: 6px; }
+.meta-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.meta-r { flex: none; margin-left: -2px; }
+.meta b { font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; }
+.meta .rank-in { display: none; }
 
-.info { flex: 1; min-width: 0; }
-.name { font-size: 16px; font-weight: 500; line-height: 1.3; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.sub { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.spark { display: block; width: 72px; height: 24px; overflow: visible; }
+.c-rank { text-align: right; }
+.pts { text-align: right; font-variant-numeric: tabular-nums; }
+.pts b { display: block; font-size: 20px; line-height: 24px; font-weight: 600; letter-spacing: -0.01em; }
+.delta { font-size: 12px; line-height: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.delta.up { color: var(--up); }
+.delta.down { color: var(--down); }
 
-.badge {
-  display: inline-block;
-  margin-top: 6px;
-  padding: 1px 8px;
-  border-radius: 6px;
-  background: var(--accent-soft);
-  color: var(--on-accent-soft);
-  font-size: 12px;
-  font-weight: 500;
+/* Сдвиг места с прошлого обновления — под номером места */
+.place-cell { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.move { font-size: 11px; line-height: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.move.up { color: var(--up); }
+.move.down { color: var(--down); }
+.move.new { color: var(--text-3); font-weight: 500; }
+
+/* Разряды — в круге */
+.rank {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 50%;
+  vertical-align: middle; line-height: 1; white-space: nowrap;
+  font-weight: 600; font-variant-numeric: tabular-nums;
+}
+.rank b { font-weight: 600; }
+.rank i { font-style: normal; font-weight: 500; font-size: 8px; margin-top: 1px; }
+.rank.s2 { font-size: 12px; }
+.rank.s3 { font-size: 10.5px; }
+.rank.s4 { font-size: 9px; letter-spacing: -0.02em; }
+.rank.youth b { font-size: 11px; }
+.rank.master { background: var(--r-master-bg); color: var(--r-master-fg); }
+.rank.kms { background: var(--r-kms-bg); color: var(--r-kms-fg); }
+.rank.adult { background: var(--r-adult-bg); color: var(--r-adult-fg); }
+.rank.youth { box-shadow: inset 0 0 0 1px var(--r-youth-line); color: var(--r-youth-fg); }
+.rank.none { color: var(--text-3); font-weight: 400; }
+.meta .rank-in { width: 26px; height: 26px; }
+.pb-sub .rank { width: 36px; height: 36px; }
+.pb-sub .rank.s2 { font-size: 14px; } .pb-sub .rank.s3 { font-size: 12px; } .pb-sub .rank.s4 { font-size: 10px; }
+
+@media (max-width: 560px) {
+  .board-head, .row { grid-template-columns: 36px minmax(0, 1fr) 56px 52px; column-gap: 10px; padding-right: 12px; padding-left: 4px; }
+  #view-athletes .board-head, #view-athletes .row { grid-template-columns: minmax(0, 1fr) 52px; padding-left: 12px; }
+  .board-head .c-rank, .row > .c-rank { display: none; }
+  .meta .rank-in { display: inline-flex; flex: none; }
+  .spark { width: 56px; }
+  .avatar { width: 32px; height: 32px; font-size: 12px; }
+  .who { gap: 10px; }
+  .place { font-size: 17px; }
+  .pts b { font-size: 17px; line-height: 22px; }
 }
 
-.pts { text-align: right; flex: none; }
-.pts b { display: block; font-size: 20px; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1.2; }
-.pts span { font-size: 12px; color: var(--muted); }
+.empty { color: var(--text-2); text-align: center; padding: 48px 24px; margin: 0; }
+.board + .empty { margin-top: 8px; }
 
-.empty { color: var(--muted); text-align: center; padding: 48px 24px; margin: 0; line-height: 1.5; }
-
-/* Карточка спортсмена */
-.back {
-  display: inline-block;
-  margin: 0 0 12px -8px;
-  padding: 8px;
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 500;
-}
-.profile { text-align: center; }
-.profile h2 { margin: 14px 0 4px; font-size: 24px; font-weight: 600; line-height: 1.25; }
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 20px 0 10px; }
-.stat { background: var(--card); border-radius: var(--radius); padding: 14px 8px; text-align: center; }
-.stat b { display: block; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.stat b.acc { color: var(--accent); }
-.stat span { font-size: 12px; color: var(--muted); }
-.best-line { text-align: center; color: var(--muted); font-size: 14px; margin: 0; }
-
-h3 { font-size: 17px; font-weight: 600; margin: 28px 4px 10px; }
-
-.hist .row { min-height: 0; padding: 14px 16px; align-items: flex-start; }
-.hist .res { text-align: right; flex: none; }
-.hist .res b { display: block; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.hist .res span { font-size: 14px; color: var(--accent); }
-.best-mark { color: var(--accent); font-size: 12px; font-weight: 600; margin-left: 8px; }
-
-.foot { font-size: 13px; padding-top: 8px; padding-bottom: 32px; line-height: 1.5; }
-
+/* Скелетон загрузки */
+.skeleton { padding: 8px 0; }
+.sk { height: 44px; margin: 10px 16px; border-radius: 8px; background: linear-gradient(90deg, var(--hover), var(--line), var(--hover)); background-size: 200% 100%; }
 @media (prefers-reduced-motion: no-preference) {
-  a.row { transition: background-color .15s ease; }
+  .sk { animation: shimmer 1.2s linear infinite; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
 }
+
+/* ---------- Профиль ---------- */
+.back {
+  display: inline-block; margin: 0 0 16px -6px; padding: 6px;
+  font-size: 14px; line-height: 20px; font-weight: 500;
+  color: var(--accent-ink); text-decoration: none;
+}
+.back:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.hero { display: grid; gap: 24px; }
+.id { display: flex; align-items: center; gap: 16px; }
+.id .avatar { width: 64px; height: 64px; font-size: 20px; }
+.id h2 { margin: 0; font-size: 28px; line-height: 32px; font-weight: 600; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.id p { margin: 4px 0 0; font-size: 14px; line-height: 20px; color: var(--text-2); }
+
+.pb-label { font-size: 13px; line-height: 18px; color: var(--text-3); }
+.pb {
+  margin: 2px 0 0;
+  font-size: 64px; line-height: 64px; font-weight: 600; letter-spacing: -0.035em;
+}
+.pb small { font-size: 28px; font-weight: 500; letter-spacing: -0.01em; color: var(--text-2); margin-left: 4px; }
+.pb-sub { margin-top: 8px; font-size: 14px; line-height: 20px; color: var(--text-2); display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+@media (max-width: 560px) { .pb { font-size: 48px; line-height: 52px; } .pb small { font-size: 22px; } .id h2 { font-size: 24px; line-height: 28px; } }
+
+.stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+}
+.stat { padding: 14px 16px; min-width: 0; }
+.stat + .stat { border-left: 1px solid var(--line); }
+.stat span { display: block; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--text-3); }
+.stat b { display: block; margin-top: 4px; font-size: 20px; line-height: 24px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+@media (max-width: 560px) { .stat { padding: 12px; } .stat b { font-size: 17px; } }
+
+.section-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 40px 0 12px; }
+.section-h h3 { margin: 0; font-size: 15px; line-height: 20px; font-weight: 600; }
+.section-h span { font-size: 13px; color: var(--text-3); }
+
+/* ---------- График прогресса ---------- */
+.chart-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.chart { position: relative; height: 240px; padding: 16px 8px 4px 0; touch-action: pan-y; }
+.chart svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.chart .grid { stroke: var(--line); stroke-width: 1; shape-rendering: crispEdges; }
+.chart .tick { fill: var(--text-3); font: 500 12px "Geist", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+.chart .line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart .area { fill: var(--accent); opacity: .08; }
+.chart .dot { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+.chart .dot.pb { fill: var(--accent-ink); }
+.chart .label { fill: var(--text); font: 600 12px "Geist", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+.chart .label.muted { fill: var(--text-2); font-weight: 500; }
+.chart .cross { stroke: var(--line-strong); stroke-width: 1; }
+.chart .hit { fill: transparent; cursor: pointer; }
+.chart-note { position: absolute; left: 56px; right: 20px; top: 12px; text-align: center; font-size: 13px; line-height: 18px; color: var(--text-2); }
+@media (max-width: 560px) { .chart { height: 200px; } }
+
+.seg {
+  display: flex; gap: 4px; padding: 8px;
+  border-top: 1px solid var(--line);
+  overflow-x: auto; scrollbar-width: none;
+}
+.seg::-webkit-scrollbar { display: none; }
+.seg button {
+  flex: none;
+  height: 32px; padding: 0 12px;
+  font: 500 13px/32px "Geist", system-ui, sans-serif; color: var(--text-2);
+  background: transparent; border: 0; border-radius: var(--radius-s);
+  cursor: pointer; white-space: nowrap;
+  transition: background-color .12s ease, color .12s ease;
+}
+.seg button:hover { background: var(--hover); color: var(--text); }
+.seg button[aria-pressed="true"] { background: var(--accent-wash); color: var(--accent-ink); }
+.seg button i { font-style: normal; font-weight: 400; color: var(--text-3); margin-left: 6px; font-variant-numeric: tabular-nums; }
+.seg button[aria-pressed="true"] i { color: inherit; opacity: .7; }
+
+.tip {
+  position: fixed; z-index: 20; pointer-events: none;
+  min-width: 140px; padding: 10px 12px;
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: var(--shadow-float);
+  font-size: 13px; line-height: 18px;
+}
+.tip b { display: block; font-size: 17px; line-height: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.tip span { color: var(--text-2); }
+
+/* ---------- Лучшее по дисциплинам ---------- */
+.pbs .row { grid-template-columns: minmax(0, 1fr) auto 64px 64px; padding-left: 16px; min-height: 52px; }
+.pbs .res { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pbs .date { font-size: 13px; color: var(--text-3); }
+@media (max-width: 560px) { .pbs .row { grid-template-columns: minmax(0, 1fr) auto 48px; } .pbs .row > .c-rank { display: none; } }
+
+/* ---------- История (timeline) ---------- */
+.year { margin: 24px 0 4px 72px; font-size: 13px; line-height: 18px; font-weight: 600; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.year:first-child { margin-top: 0; }
+.tl { list-style: none; margin: 0; padding: 0; }
+.tl li {
+  position: relative;
+  display: grid; grid-template-columns: 56px 16px minmax(0, 1fr) auto;
+  column-gap: 12px; padding: 12px 0;
+}
+.tl li::before {  /* вертикальная ось */
+  content: ""; position: absolute; left: 75px; top: 0; bottom: 0; width: 1px; background: var(--line);
+}
+.tl li:first-child::before { top: 20px; }
+.tl li:last-child::before { bottom: calc(100% - 20px); }
+.tl .d { text-align: right; font-size: 13px; line-height: 20px; color: var(--text-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tl .node {
+  position: relative; z-index: 1; width: 9px; height: 9px; margin: 6px auto 0;
+  border-radius: 50%; background: var(--surface); box-shadow: 0 0 0 1.5px var(--line-strong);
+}
+.tl .node.pb { background: var(--accent); box-shadow: 0 0 0 3px var(--bg); }
+.tl .ev { font-size: 15px; line-height: 20px; font-weight: 500; }
+.tl .ev-meta { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; line-height: 18px; color: var(--text-2); }
+.tag { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--accent-ink); }
+.tag.best { padding: 1px 6px; border-radius: 6px; background: var(--accent-wash); }
+.tl .r { text-align: right; }
+.tl .r b { display: block; font-size: 17px; line-height: 20px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tl .r span { font-size: 13px; line-height: 18px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+@media (max-width: 560px) {
+  .year { margin-left: 60px; }
+  .tl li { grid-template-columns: 44px 16px minmax(0, 1fr) auto; column-gap: 8px; }
+  .tl li::before { left: 59px; }
+}
+
+.foot { padding-top: 8px; padding-bottom: 40px; font-size: 13px; line-height: 20px; color: var(--text-3); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+/* ---------- Медали и достижения ---------- */
+.medals { grid-template-columns: repeat(3, 1fr); }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }
+.dot.gold { background: var(--gold); } .dot.silver { background: var(--silver); } .dot.bronze { background: var(--bronze); }
+.ach .row { grid-template-columns: 56px minmax(0, 1fr); padding-left: 12px; }
+.ach-place { display: flex; flex-direction: column; align-items: center; }
+.ach-place b { font-size: 28px; line-height: 30px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.ach-place span { font-size: 12px; color: var(--text-3); font-weight: 500; }
+.ach-place.prize b { color: var(--accent-ink); }
+.ach .meta { display: block; white-space: normal; }
+.tl .comp { margin-top: 2px; font-size: 13px; line-height: 18px; color: var(--text-2); }
+
+/* ---------- Номинации ---------- */
+.noms { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+@media (min-width: 640px) { .noms { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.nom {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 12px 8px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+}
+.nom img { width: 88px; height: 88px; object-fit: contain; }
+.nom b { margin-top: 8px; font-size: 13px; line-height: 17px; font-weight: 500; }
+.nom span { margin-top: 2px; font-size: 12px; line-height: 16px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.empty-box { margin: 0; padding: 16px; text-align: center; color: var(--text-2); border: 1px dashed var(--line-strong); border-radius: var(--radius); background: var(--surface); }
+
+/* ---------- Места и серия побед ---------- */
+.places .streak { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.places .streak.off .flame { opacity: .35; }
+.flame { width: 30px; height: 30px; flex: none; }
+.streak-n { font-size: 30px; line-height: 32px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.streak > span { display: flex; flex-direction: column; margin-left: 4px; }
+.streak > span b { font-size: 15px; font-weight: 500; }
+.streak > span span { font-size: 13px; color: var(--text-2); }
+.pl-row { display: grid; grid-template-columns: 96px 32px 1fr 44px; align-items: center; column-gap: 12px; padding: 0 16px; min-height: 44px; }
+.pl-row + .pl-row { border-top: 1px solid var(--line); }
+.pl-label { font-size: 14px; white-space: nowrap; }
+.pl-label .dot:not(.gold):not(.silver):not(.bronze) { visibility: hidden; }
+.pl-count { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+.pl-bar { height: 6px; border-radius: 3px; background: var(--hover); overflow: hidden; }
+.pl-bar span { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.pl-pct { text-align: right; font-size: 13px; color: var(--text-2); font-variant-numeric: tabular-nums; }
