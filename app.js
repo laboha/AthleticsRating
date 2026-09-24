@@ -399,7 +399,7 @@ function renderRating() {
         <span class="who">${avatar(a)}
           <span class="who-text">
             <span class="name">${esc(a.name)}</span>
-            <span class="meta"><span class="meta-t">${esc(ev.name)}</span><b class="meta-r">${esc(r.display)}</b>${rankBadge(r.rank, 'rank-in')}</span>
+            <span class="meta">${rankBadge(r.rank, 'rank-in')}<span class="meta-t">${esc(ev.name)}</span><b class="meta-r">${esc(r.display)}</b></span>
           </span>
         </span>
         <span class="c-spark">${sparkline(results, r.eventId)}</span>
@@ -435,7 +435,7 @@ function renderAthletes() {
       <span class="who">${avatar(a)}
         <span class="who-text">
           <span class="name">${esc(a.name)}</span>
-          <span class="meta"><span class="meta-t">${meta}</span>${r ? rankBadge(r.rank, 'rank-in') : ''}</span>
+          <span class="meta">${r ? rankBadge(r.rank, 'rank-in') : ''}<span class="meta-t">${meta}</span></span>
         </span>
       </span>
       <span class="c-rank">${r ? rankBadge(r.rank) : ''}</span>
@@ -512,7 +512,7 @@ function renderAthlete(id) {
       <div class="streak${streak.best ? '' : ' off'}">
         <svg class="flame" viewBox="0 0 24 24" aria-hidden="true"><path fill="var(--flame-outer)" d="M12,2C12,2 13.2,5.3 11,8.1C9.6,9.9 7.5,11.4 7.5,14.6C7.5,18.6 10.4,21.5 12,22C16,21.6 18.5,18.6 18.5,15C18.5,11.4 16.2,9.5 15.6,7.2C15.4,8.9 14.6,10 13.6,10.4C14.3,7.1 13.5,4.2 12,2Z"/><path fill="var(--flame-inner)" d="M12.4,12.2C12.6,13.8 11.4,14.6 10.8,15.8C10.3,16.8 10.5,18.9 12.2,20C14.1,19.8 15.6,18.4 15.6,16.4C15.6,14.6 14.2,13.7 13.8,12.4C13.6,13.3 13.2,13.8 12.8,14C12.9,13.3 12.8,12.7 12.4,12.2Z"/></svg>
         <b class="streak-n">${streak.best}</b>
-        <span><b>Серия побед</b><span>лучшая серия 1-х мест подряд, сейчас ${streak.current}</span></span>
+        <span><b>Серия побед</b><span>лучшая серия 1-х мест подряд</span></span>
       </div>
       ${line('1 место', 'gold', 'gold')}${line('2 место', 'silver', 'silver')}${line('3 место', 'bronze', 'bronze')}${line('Топ-5', 'top5')}${line('Топ-10', 'top10')}
     </div>`;

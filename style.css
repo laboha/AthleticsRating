@@ -25,7 +25,7 @@
   --accent-wash: #EAF2FB;
 
   /* Разряды: одна шкала голубого, от насыщенного к контурному */
-  --r-master-bg: #17467A; --r-master-fg: #FFFFFF;
+  --r-master-bg: #3E5F80; --r-master-fg: #FFFFFF;
   --r-kms-bg: #2F6FAE;    --r-kms-fg: #FFFFFF;
   --r-adult-bg: #E3EEF9;  --r-adult-fg: #1F5F9E;
   --r-youth-line: #C9D6E3; --r-youth-fg: #4A6F94;
@@ -58,7 +58,7 @@
     --accent-ink: #8DBDEB;
     --accent-wash: #1A2A3B;
 
-    --r-master-bg: #A9CDF1; --r-master-fg: #0B2440;
+    --r-master-bg: #34506E; --r-master-fg: #E6EEF7;
     --r-kms-bg: #2F6FAE;    --r-kms-fg: #FFFFFF;
     --r-adult-bg: #1E3550;  --r-adult-fg: #CFE2F5;
     --r-youth-line: #34465A; --r-youth-fg: #8FA9C4;
@@ -311,7 +311,8 @@ a.row:focus-visible { outline-offset: -2px; border-radius: 0; }
 
 .hero { display: grid; gap: 24px; }
 .id { display: flex; align-items: center; gap: 16px; }
-.id .avatar { width: 64px; height: 64px; font-size: 20px; }
+.id .avatar { width: 112px; height: 112px; font-size: 34px; }
+.id { gap: 20px; }
 .id h2 { margin: 0; font-size: 28px; line-height: 32px; font-weight: 600; letter-spacing: -0.02em; overflow-wrap: anywhere; }
 .id p { margin: 4px 0 0; font-size: 14px; line-height: 20px; color: var(--text-2); }
 
@@ -322,7 +323,7 @@ a.row:focus-visible { outline-offset: -2px; border-radius: 0; }
 }
 .pb small { font-size: 28px; font-weight: 500; letter-spacing: -0.01em; color: var(--text-2); margin-left: 4px; }
 .pb-sub { margin-top: 8px; font-size: 14px; line-height: 20px; color: var(--text-2); display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
-@media (max-width: 560px) { .pb { font-size: 48px; line-height: 52px; } .pb small { font-size: 22px; } .id h2 { font-size: 24px; line-height: 28px; } }
+@media (max-width: 560px) { .id .avatar { width: 96px; height: 96px; font-size: 30px; } .id { gap: 16px; } .pb { font-size: 48px; line-height: 52px; } .pb small { font-size: 22px; } .id h2 { font-size: 24px; line-height: 28px; } }
 
 .stats {
   display: grid; grid-template-columns: repeat(4, 1fr);
